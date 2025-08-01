@@ -11,14 +11,15 @@
 
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "./contexts/AuthContext";
 
 // Layout Components
 import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 
+// Routes
+import HomeRoute from "./routes/HomeRoute";
+
 // Public Pages
-import Landing from "./pages/Landing";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import ForgotPassword from "./components/auth/ForgotPassword";
@@ -63,7 +64,7 @@ function App() {
             <main className="flex-grow">
               <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={<Landing />} />
+                <Route path="/" element={<HomeRoute />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
