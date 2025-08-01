@@ -45,45 +45,7 @@ import TaskFilter from "./components/tasks/TaskFilter";
 // Context Providers
 import AuthProvider from "./contexts/AuthContext";
 import NotificationProvider from "./contexts/NotificationContext";
-
-/**
- * Protected Route Component
- * 
- * Higher-order component that protects routes requiring authentication.
- * Redirects unauthenticated users to the login page with return path.
- * 
- * @param {Object} props - Component props
- * @param {React.ReactNode} props.children - Child components to render when authenticated
- * @param {string} [props.requiredRole] - Optional role required to access the route
- */
-const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, hasRole } = useAuth();
-  const location = useLocation();
-  
-  // Check if user is authenticated
-  const isAuthenticated = !!user || !!localStorage.getItem("token");
-  
-  // If not authenticated, redirect to login
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
-  }
-  
-  // If role is required, check if user has the role
-  if (requiredRole) {
-    const hasRequiredRole = hasRole(requiredRole);
-    
-    if (!hasRequiredRole) {
-      // Redirect to appropriate dashboard based on user's role
-      const userRole = localStorage.getItem("userRole");
-      const redirectPath = userRole === "admin" ? "/admin/dashboard" : "/user/dashboard";
-      
-      return <Navigate to={redirectPath} replace />;
-    }
-  }
-  
-  // User is authenticated and has required role (if specified)
-  return children;
-};
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 /**
  * Main App Component

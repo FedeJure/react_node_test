@@ -28,7 +28,7 @@ import { useAuth } from "../../contexts/AuthContext";
  * @returns {React.ReactElement} Protected route component
  */
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, hasRole } = useAuth();
+  const { hasRole, isAuthenticated } = useAuth();
   const location = useLocation();
   
   /**
@@ -37,12 +37,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   useEffect(() => {
     console.log(`Route access attempt: ${location.pathname}`);
   }, [location.pathname]);
-
-  /**
-   * Check if user is authenticated using both context and localStorage
-   * This dual-check approach ensures reliability across page refreshes
-   */
-  const isAuthenticated = !!user || !!localStorage.getItem("token");
   
   // If not authenticated, redirect to login with return path
   if (!isAuthenticated) {
