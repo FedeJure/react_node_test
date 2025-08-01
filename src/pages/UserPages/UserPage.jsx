@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import UserSidebar from "./UserSidebar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SimpleTaskFilter from "../../components/SimpleTaskFilter";
+import useTaskFilter from "../../hooks/useTaskFilter";
 
 const UserPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -13,6 +15,8 @@ const UserPage = () => {
     deadline: "",
     progress: 0,
   });
+
+  const { filteredTasks, filters, updateFilter } = useTaskFilter(tasks);
 
   useEffect(() => {
     // ✅ Fetch logged-in user from localStorage
@@ -87,6 +91,14 @@ const UserPage = () => {
 
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
+        {/* Task Filter */}
+        <SimpleTaskFilter 
+          filters={filters}
+          onFilterChange={updateFilter}
+          taskCount={tasks.length}
+          filteredCount={filteredTasks.length}
+        />
+
         {/* Task Creation Box */}
         <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg mb-8 border border-gray-200">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Create a New Task</h2>
@@ -151,10 +163,16 @@ const UserPage = () => {
 
         {/* Task List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tasks.length === 0 ? (
-            <p className="text-gray-600">No tasks created yet. Start by adding a task!</p>
+          {filteredTasks.length === 0 ? (
+            <div className="col-span-full text-center py-8">
+              {tasks.length === 0 ? (
+                <p className="text-gray-600">No tasks created yet. Start by adding a task!</p>
+              ) : (
+                <p className="text-gray-600">No tasks match your current filters.</p>
+              )}
+            </div>
           ) : (
-            tasks.map((task) => (
+            filteredTasks.map((task) => (
               <div key={task.id} className="bg-white shadow-md p-4 rounded-md border-l-4 border-blue-400">
                 <h3 className="text-lg font-semibold">{task.title}</h3>
                 <p className="text-gray-600">{task.description}</p>

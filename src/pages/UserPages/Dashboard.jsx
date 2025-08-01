@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { DndContext, closestCorners } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Bar } from "react-chartjs-2";
@@ -8,6 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 import UserSidebar from "./UserSidebar";
 import Column from "./Column";
 import SortableItem from "./SortableItem";
+import SimpleTaskFilter from "../../components/SimpleTaskFilter";
+import useTaskFilter from "../../hooks/useTaskFilter";
 import notificationSound from "./notification.mp3";
 
 const UserDashboard = () => {
@@ -19,6 +21,22 @@ const UserDashboard = () => {
 
   const [notes, setNotes] = useState(localStorage.getItem("notes") || "");
   const audioRef = useRef(new Audio(notificationSound));
+
+  // Get all tasks as a flat array for filtering - memoized to prevent infinite re-renders
+  const allTasks = useMemo(() => {
+    return [...tasks["To Do"], ...tasks["In Progress"], ...tasks.Completed];
+  }, [tasks]);
+
+  const { filteredTasks: flatFilteredTasks, filters, updateFilter } = useTaskFilter(allTasks);
+
+  // Convert filtered tasks back to categorized format - also memoized
+  const filteredTasks = useMemo(() => {
+    return {
+      "To Do": flatFilteredTasks.filter((task) => task.progress <= 40),
+      "In Progress": flatFilteredTasks.filter((task) => task.progress > 40 && task.progress <= 80),
+      Completed: flatFilteredTasks.filter((task) => task.progress > 80),
+    };
+  }, [flatFilteredTasks]);
 
   // 🔹 Ensure page starts from top when component loads
   useEffect(() => {
@@ -114,14 +132,22 @@ const UserDashboard = () => {
         </h2>
         <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
 
+        {/* Task Filter */}
+        <SimpleTaskFilter 
+          filters={filters}
+          onFilterChange={updateFilter}
+          taskCount={allTasks.length}
+          filteredCount={flatFilteredTasks.length}
+        />
+
         {/* Kanban Board */}
         <div className="glassmorphism p-4 rounded-xl shadow-lg bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-lg border border-white/20">
           <DndContext collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.keys(tasks).map((columnKey) => (
+              {Object.keys(filteredTasks).map((columnKey) => (
                 <Column key={columnKey} title={columnKey} id={columnKey} className="w-[280px]">
-                  <SortableContext items={tasks[columnKey].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                    {tasks[columnKey].map((task) => (
+                  <SortableContext items={filteredTasks[columnKey].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                    {filteredTasks[columnKey].map((task) => (
                       <SortableItem key={task.id} id={task.id} task={task} />
                     ))}
                   </SortableContext>
