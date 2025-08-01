@@ -22,12 +22,12 @@ This project is an implementation of the TaskFlow test, a MERN stack task manage
 
 1. **Complete the tasks**:
 
-△ (WIP)Task 1 - Display Login/Register page before the landing page
+△ Task 1 - Display Login/Register page before the landing page
 
 - Users are should to login first to access the full list of tabs.
 - When they're logged out, only Dashboard panel should to be displayed.
 
-△ Task 2 - Task Filter
+△ (WIP)Task 2 - Task Filter
 
 - Allow users to filter tasks based on their completion status (e.g., show only completed or incomplete tasks).
 - Optional: Add a search feature to filter tasks by title.
